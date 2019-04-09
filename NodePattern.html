@@ -1,0 +1,136 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  	<meta charset="utf-8">
+
+  	<title>Node Pattern Password</title>
+
+  	<link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body onload="startGame()">
+	<h1>Node Pattern Password</h1>
+	<canvas id="canvas" width="162" height="170"></canvas>
+  	<script>
+  		var width = 162;
+  		var height = 170;
+  		var pattern = [];
+  		var nodes = [];
+
+		function startGame() {
+			nodes.push( 
+				new Node( 21, 22, 0 ), new Node( 80, 22, 1 ), new Node( 140, 22, 2 ), 
+				new Node( 21, 82, 3 ), new Node( 80, 82, 4 ), new Node( 140, 82, 5 ), 
+				new Node( 21, 143, 6 ), new Node( 80, 143, 7 ), new Node( 140, 143, 8 )
+				);
+			GAMEAREA.start( );
+		}
+
+		var GAMEAREA = {
+		    canvas : document.getElementById("canvas"),
+		    start : function() {
+		    	this.canvas.width = width;
+		    	this.canvas.height = height;
+		        this.context = this.canvas.getContext("2d");
+		        this.interval = setInterval( updateGameArea, 1000/60 );
+
+		        window.addEventListener('click', function( e ) {
+		        	for ( var i = 0; i < nodes.length; ++i ){
+		        		if ( mousePos.x < nodes[i].bbox.x_right &&
+		        			mousePos.x > nodes[i].bbox.x_left &&
+		        			mousePos.y < nodes[i].bbox.y_lower &&
+		        			mousePos.y > nodes[i].bbox.y_upper) 
+		        		{
+		        			if ( nodes[i].selected ) break;
+
+		        			nodes[i].selected = true;
+		        			pattern.push(nodes[i].id);
+		        			break;
+		        		}
+		        	}
+		        })
+		    },
+
+		    clear : function() {
+		    	this.context.clearRect( 0, 0, this.canvas.width, this.canvas.height );
+	    	},
+
+	    	getMousePos: function(canvas, e) {
+			    var rect = document.getElementById("canvas").getBoundingClientRect();
+			    return {
+			    	x: e.clientX - rect.left,
+			    	y: e.clientY - rect.top
+				};
+			}
+		}
+
+		function updateGameArea() {
+			GAMEAREA.clear();
+
+			for (var i = 0; i < nodes.length; ++i) {
+    			nodes[i].update();
+    		}
+
+    		ctx = canvas.getContext("2d");
+
+    		ctx.beginPath();
+
+    		if ( pattern.length > 0 ) {
+				ctx.moveTo( nodes[pattern[0]].x, nodes[pattern[0]].y );
+    		}
+
+    		for ( var i = 1; i < pattern.length; ++i ) {
+    			ctx.lineTo(nodes[pattern[i]].x, nodes[pattern[i]].y);
+    		}
+
+    		
+    		ctx.stroke();
+		}
+
+		var mousePos = {
+			x : width / 2,
+			y : height / 2
+		};
+
+		document.getElementById("canvas").addEventListener('mousemove', function(e) {
+			mousePos = GAMEAREA.getMousePos(document.getElementById("canvas"), e);
+		}, false);
+
+		function Node(x, y, id, selected=false) {
+			this.x = x;
+			this.y = y;
+			this.r = 20;
+			this.r_active = 50;
+			this.bbox = {
+				y_upper: this.y - this.r,
+				y_lower: this.y + this.r,
+				x_left: this.x - this.r,
+				x_right: this.x + this.r
+			};
+			this.selected = false;
+			this.id = id;
+
+			this.update = function() {
+				var c = document.getElementById("canvas");
+				var ctx = c.getContext("2d");
+				if ( !this.selected ){
+					ctx.beginPath();
+					ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+					ctx.stroke();
+					ctx.fillStyle = "#ededed";
+					ctx.fill();
+				}
+				else {
+					ctx.beginPath();
+					ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+					ctx.stroke();
+					ctx.fillStyle = "#555";
+					ctx.fill();
+				}
+			}
+		}
+  	</script>
+</body>
+</html>

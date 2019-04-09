@@ -1,0 +1,17 @@
+body {
+	margin:0;
+	padding:0;
+	background-color:#ededed;
+}
+h1 {
+	margin:0;
+	padding:0;
+	text-align:center;
+	color:#111;
+}
+canvas{
+	display:block;
+	background-color:transparent;
+	margin:20px auto 0 auto;
+	/*border:1px solid #00f;*/
+}
